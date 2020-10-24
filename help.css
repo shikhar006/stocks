@@ -1,0 +1,27 @@
+h1 {
+	text-align: center;
+}
+
+h3 {
+	text-align: center;
+}
+
+h2 {
+	text-align: center;
+}
+
+.content {
+	margin-left: 20px;
+}
+
+.lookup {
+	margin-left: 20px;
+}
+
+body {
+	background-image: url("stonks.png");
+}
+
+.buy {
+	margin-left: 20px;
+}
