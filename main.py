@@ -20,8 +20,6 @@ root_menu.grid_columnconfigure(2, weight=1)
 
 # Defining the functions
 def f_lookup():
-	global stockmain
-	stockmain = ""
 	# Configure the lookup menu
 	root_lookup = Tk()
 	root_lookup.title("LOOKUP")
@@ -38,26 +36,30 @@ def f_lookup():
 		def main():
 			global stockmain
 			symbol = ent_lookup.get()
-			stock_price = ""
+			stock_price = 0
 			result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={symbol}").text
 			soup = BeautifulSoup(result, features="lxml")
 			stock_price = soup.find("span",attrs = {"streamformat": "ToHundredth"})
-			stock_price = str(stock_price)
-			stock_price = stock_price.split("<")
-			stock_price = stock_price[1]
-			stock_price = stock_price.split(">")
-			stock_price = stock_price[1]
-			stock_price = list(stock_price)
-			if "," in stock_price:
-				stock_price.remove(",")
-			for i in stock_price:
-				stockmain = stockmain + i
-			stock_price = float(stockmain)
-			stock_price_str = str(stockmain)+ " $"
-			stock_label = Label(root_lookup, text = f"{stock_price_str}")
-			stock_label.grid(row = 3, column = 2, padx = 3, pady = 3)
-			label_help = Label(root_lookup, text = "For more info click")
-			label_help.grid(row = 4,column = 2, padx = 3, pady = 3)
+			try:
+				stock_price = str(stock_price)
+				stock_price = stock_price.split("<")
+				stock_price = stock_price[1]
+				stock_price = stock_price.split(">")
+				stock_price = stock_price[1]
+				stock_price = list(stock_price)
+				if "," in stock_price:
+					stock_price.remove(",")
+				for i in stock_price:
+					stockmain = stockmain + i
+				stock_price = float(stockmain)
+				stock_price_str = str(stockmain)+ " $"
+				stock_label = Label(root_lookup, text = f"{stock_price_str}")
+				stock_label.grid(row = 3, column = 2, padx = 3, pady = 3)
+				label_help = Label(root_lookup, text = "For more info click")
+				label_help.grid(row = 4,column = 2, padx = 3, pady = 3)
+			except:
+				messagebox.showinfo("Error", "Enter a valid symbol")
+				root_lookup.destroy()
 		
 			def stats():
 				webbrowser.open(f"https://money.cnn.com/quote/quote.html?symb={symbol}")
@@ -83,23 +85,36 @@ def f_buy():
 	def f_search_buy():
 		global stockmain
 		symbol = ent_lookup.get()
-		stock_price = ""
+		stock_price = 0
 		result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={symbol}").text
 		soup = BeautifulSoup(result, features="lxml")
 		stock_price = soup.find("span",attrs = {"streamformat": "ToHundredth"})
-		stock_price = str(stock_price)
-		stock_price = stock_price.split("<")
-		stock_price = stock_price[1]
-		stock_price = stock_price.split(">")
-		stock_price = stock_price[1]
-		stock_price = list(stock_price)
-		if "," in stock_price:
-			stock_price.remove(",")
-		for i in stock_price:
-			stockmain = stockmain + i
-		stock_price = float(stockmain)
-		stock_price_str = str(stockmain)+ " $"
-		stock_label = Label(root_buy, text = f"{stock_price_str}")
+		try:
+			stock_price = str(stock_price)
+			
+			stock_price = stock_price.split("<")
+			
+			stock_price = stock_price[1]
+			
+			stock_price = stock_price.split(">")
+			
+			stock_price = stock_price[1]
+			
+			stock_price = list(stock_price)
+			
+			if "," in stock_price:
+				stock_price.remove(",")
+				
+			for i in stock_price:
+				stockmain = stockmain + i
+				
+			stock_price = float(stockmain)
+			
+			stock_label = Label(root_buy, text = f"{stockmain}$")
+			stock_label.grid(row = 3, column = 2, padx = 3, pady = 3)
+		except:
+			messagebox.showinfo("Error", "Enter a valid symbol")
+			root_buy.destroy()
 		label_help = Label(root_buy, text = "For more info click")
 		label_help.grid(row = 5,column = 2, padx = 3, pady = 3)		
 		def stats():
