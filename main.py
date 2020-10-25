@@ -9,9 +9,19 @@ from PIL import ImageTk,Image
 from tkinter import messagebox
 
 # Variables
-money = pickle.load(open("money.dat","rb"))
+try:
+	money = pickle.load("money.dat","rb")
+except:
+	money = 1000
+	pickle.dump(money, open("money.dat", "wb"))
 stockmain = ""
 
+# Dictionary
+try:
+	stocks = pickle.load(open("stocks.dat", "rb"))
+except:
+	stocks = {}
+	pickle.dump(stocks,open("stocks.dat","wb"))
 # Configure the menu
 root_menu = Tk()
 root_menu.title("MENU")
@@ -89,29 +99,22 @@ def f_buy():
 		result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={symbol}").text
 		soup = BeautifulSoup(result, features="lxml")
 		stock_price = soup.find("span",attrs = {"streamformat": "ToHundredth"})
+		symbol = str(symbol)
 		try:
 			stock_price = str(stock_price)
-			
 			stock_price = stock_price.split("<")
-			
 			stock_price = stock_price[1]
-			
 			stock_price = stock_price.split(">")
-			
-			stock_price = stock_price[1]
-			
+			stock_price = stock_price[1]			
 			stock_price = list(stock_price)
-			
 			if "," in stock_price:
 				stock_price.remove(",")
-				
 			for i in stock_price:
 				stockmain = stockmain + i
-				
 			stock_price = float(stockmain)
-			
-			stock_label = Label(root_buy, text = f"{stockmain}$")
+			stock_label = Label(root_buy, text = f"{stock_price}$")
 			stock_label.grid(row = 3, column = 2, padx = 3, pady = 3)
+			stockmain = stock_price
 		except:
 			messagebox.showinfo("Error", "Enter a valid symbol")
 			root_buy.destroy()
@@ -131,6 +134,7 @@ def f_buy():
 			global stockmain
 			global stock_price
 			global money
+			
 			quantity = int(ent_quantity.get())
 			if quantity > 10 or quantity < 1:
 				messagebox.showinfo("Error", "Renter the quantity lesser than 10 and greater than 1")
@@ -139,11 +143,30 @@ def f_buy():
 				price = float(stockmain * quantity)
 				if price > money:
 					messagebox.showinfo("Error",f"You only have {money}$ but the cost is {price}$")
+				else:
+					try:
+						label_total_price.destroy()
+					except:
+						pass
+					label_total_price = Label(root_buy, text = f"{price}$ is total price",width = 60)
+					label_total_price.grid(row = 10, column = 2, padx = 3, pady = 3)
+
+					# Defining the buying button
+					def last_conform():
+						stock_price_final = stockmain * quantity 
+						stocks[symbol] = [stockmain,quantity,stock_price_final]
+						messagebox.showinfo("Bought", f"The stock {symbol} has been bought for {price} of quantity {quantity} for {stockmain} per share.")
+
+					# Creating the final button for buying
+					btn_continue = Button(root_buy, text = "Continue?", command = last_conform)
+					btn_continue.grid(row = 11, column = 2, padx = 3, pady = 3)
+
 		# Creating the Quantity button
 		btn_enter_quantity = ttk.Button(root_buy, text = "Enter", command = enter_quantity)
 		btn_enter_quantity.grid(row = 9, column = 2, padx = 3, pady = 3)
+		
 		# Config the menu
-		root_buy.geometry("250x300")
+		root_buy.geometry("250x320")
 		
 		# Creating the buttons
 	btn_lookup_buy = ttk.Button(root_buy, text = "Lookup", command = f_search_buy)
