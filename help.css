@@ -1,7 +1,6 @@
 h1 {
 	text-align: center;
 }
-
 h3 {
 	text-align: center;
 }
@@ -11,11 +10,11 @@ h2 {
 }
 
 .content {
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 .lookup {
-	margin-left: 20px;
+	margin-left: 10px;
 }
 
 body {
@@ -23,5 +22,5 @@ body {
 }
 
 .buy {
-	margin-left: 20px;
+	margin-left: 10px;
 }
