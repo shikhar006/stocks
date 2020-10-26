@@ -41,11 +41,14 @@ def f_lookup():
 	
 	# Defining the search button
 	def f_search():
+		symbol = ""
 		global stockmain
+		#stockmain = ""
 		def main():
 			global stockmain
 			symbol = ent_lookup.get()
 			stock_price = 0
+			stockmain = ""
 			result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={symbol}").text
 			soup = BeautifulSoup(result, features="lxml")
 			stock_price = soup.find("span",attrs = {"streamformat": "ToHundredth"})
@@ -79,7 +82,7 @@ def f_lookup():
 	btn_lookup_lookup.grid(row = 1, column = 2, pady = 3, padx = 3)
 def f_buy():
 	global stockmain
-	stockmain = ""
+	
 	# Configure the lookup menu
 	root_buy = Tk()
 	root_buy.title(f"Stonks-Buy-{money}$ left")
@@ -93,7 +96,10 @@ def f_buy():
 	# Defining the search button
 	def f_search_buy():
 		global stockmain
+		stockmain = ""
+		symbol = ""
 		symbol = ent_lookup.get()
+		
 		stock_price = 0
 		result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={symbol}").text
 		soup = BeautifulSoup(result, features="lxml")
@@ -158,6 +164,7 @@ def f_buy():
 						messagebox.showinfo("Bought", f"The stock {symbol} has been bought for {price}$ of quantity {quantity} for {stockmain}$ per share.")
 						pickle.dump(stocks,open("stocks.dat", "wb"))
 						money = money - stock_price_final
+						money = round(money, 2)
 						pickle.dump(money,open("money.dat", "wb"))
 
 					# Creating the final button for buying
@@ -198,12 +205,20 @@ def f_view():
 	
 	label_current_price_index = Label(root_view, text = "Current Price", width = 10)
 	label_current_price_index.grid(row = 0, column = 3, padx = 5,pady = 5)
+
+	label_selling_percent_index = Label(root_view, text = "loss or profit %", width = 15)
+	label_selling_percent_index.grid(row = 0, column = 4, padx = 5,pady = 5)
 	
+	label_selling_dollars_index = Label(root_view, text = "loss or profit $", width = 15)
+	label_selling_dollars_index.grid(row = 0, column = 5, padx = 5,pady = 5)
+
 	def __main__():
-		stock_main = ""
-		try:
+		b = True
+		if b == True:
 			a = 1 
 			for i in stocks:
+				stock_main = ""
+				
 				label_stock_name = Label(root_view, text = i, width = 15)
 				label_stock_name.grid(row = a, column = 0, padx = 5,pady = 5)
 				
@@ -212,7 +227,7 @@ def f_view():
 				
 				label_quantity = Label(root_view, text = stocks[i][1], width = 10)
 				label_quantity.grid(row = a, column = 2, padx = 5,pady = 5)
-
+				
 				stock_symbol = i
 				result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={stock_symbol}").text
 				soup_2 = BeautifulSoup(result, features="lxml")
@@ -231,12 +246,33 @@ def f_view():
 
 				label_stock_price_current = Label(root_view, text = stock_price_current, width = 10)
 				label_stock_price_current.grid(row = a, column = 3, padx = 5,pady = 5)
+				
+				def __high__():
+					
+					selling_percent = ((stock_price_current - stocks[stock_symbol][0])/100) * 100
+					selling_percent = round(selling_percent,2)
+					selling_percent = str(selling_percent)
+					selling_percent = selling_percent + "%"
+						
+					selling_dollars = stock_price_current - stocks[stock_symbol][0]
+					selling_dollars = round(selling_dollars,2)
+					selling_dollars = str(selling_dollars)
+					selling_dollars = selling_dollars + "$"
+
+					label_selling_percent = Label(root_view, text = selling_percent, width = 15)
+					label_selling_percent.grid(row = a, column = 4, padx = 5,pady = 5)
+					
+					label_selling_dollars = Label(root_view, text = selling_dollars, width = 15)
+					label_selling_dollars.grid(row = a, column = 5, padx = 5,pady = 5)
+
+
+				__high__()
 
 				a = a+1
-
-		except:
-			messagebox.showinfo("Error", "First buy some stock")
-			root_view.destroy()
+		
+		#except:
+		#	messagebox.showinfo("Error", "First buy some stock")
+		#	root_view.destroy()
 	__main__()
 
 # Creating the buttons
