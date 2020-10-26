@@ -1,16 +1,15 @@
-# Importing stuff
+# Importing modules
 from tkinter import *
 from tkinter import ttk
 import requests
 from bs4 import BeautifulSoup
 import pickle
 import webbrowser
-from PIL import ImageTk,Image
 from tkinter import messagebox
 
 # Variables
 try:
-	money = pickle.load("money.dat","rb")
+	money = pickle.load(open("money.dat","rb"))
 except:
 	money = 1000
 	pickle.dump(money, open("money.dat", "wb"))
@@ -153,9 +152,13 @@ def f_buy():
 
 					# Defining the buying button
 					def last_conform():
+						global money
 						stock_price_final = stockmain * quantity 
 						stocks[symbol] = [stockmain,quantity,stock_price_final]
-						messagebox.showinfo("Bought", f"The stock {symbol} has been bought for {price} of quantity {quantity} for {stockmain} per share.")
+						messagebox.showinfo("Bought", f"The stock {symbol} has been bought for {price}$ of quantity {quantity} for {stockmain}$ per share.")
+						pickle.dump(stocks,open("stocks.dat", "wb"))
+						money = money - stock_price_final
+						pickle.dump(money,open("money.dat", "wb"))
 
 					# Creating the final button for buying
 					btn_continue = Button(root_buy, text = "Continue?", command = last_conform)
@@ -173,15 +176,84 @@ def f_buy():
 	btn_lookup_buy.grid(row = 1, column = 2, pady = 3, padx = 3)
 def f_help():
 	webbrowser.open("https://shikhar006.github.io/stonks/help.html")
+
+def f_money():
+	messagebox.showinfo("Funds", f"Money left {money}$")
+
+def f_view():
+	# Making the view menu
+	root_view = Tk()
+	root_view.title("View")
+	
+
+	# Creating the column names
+	label_stock_name_index = Label(root_view, text = "Symbol", width = 15 )
+	label_stock_name_index.grid(row = 0, column = 0, padx = 5,pady = 5)
+	
+	label_bought_price_index = Label(root_view, text = "Bought For", width = 15)
+	label_bought_price_index.grid(row = 0, column = 1, padx = 5,pady = 5)
+	
+	label_quantity_index = Label(root_view , text = "Quantity", width = 10)
+	label_quantity_index.grid(row = 0, column = 2, padx = 5,pady = 5)
+	
+	label_current_price_index = Label(root_view, text = "Current Price", width = 10)
+	label_current_price_index.grid(row = 0, column = 3, padx = 5,pady = 5)
+	
+	def __main__():
+		stock_main = ""
+		try:
+			a = 1 
+			for i in stocks:
+				label_stock_name = Label(root_view, text = i, width = 15)
+				label_stock_name.grid(row = a, column = 0, padx = 5,pady = 5)
+				
+				label_bought_price = Label(root_view, text = stocks[i][0], width = 15)
+				label_bought_price.grid(row = a, column = 1, padx = 5,pady = 5)
+				
+				label_quantity = Label(root_view, text = stocks[i][1], width = 10)
+				label_quantity.grid(row = a, column = 2, padx = 5,pady = 5)
+
+				stock_symbol = i
+				result = requests.get(f"https://money.cnn.com/quote/quote.html?symb={stock_symbol}").text
+				soup_2 = BeautifulSoup(result, features="lxml")
+				stock_price_current = soup_2.find("span",attrs = {"streamformat": "ToHundredth"})
+				stock_price_current = str(stock_price_current)
+				stock_price_current = stock_price_current.split("<")
+				stock_price_current = stock_price_current[1]
+				stock_price_current = stock_price_current.split(">")
+				stock_price_current = stock_price_current[1]
+				stock_price_current = list(stock_price_current)
+				if "," in stock_price_current:
+					stock_price_current.remove(",")
+				for i in stock_price_current:
+					stock_main = stock_main + i
+				stock_price_current = float(stock_main)
+
+				label_stock_price_current = Label(root_view, text = stock_price_current, width = 10)
+				label_stock_price_current.grid(row = a, column = 3, padx = 5,pady = 5)
+
+				a = a+1
+
+		except:
+			messagebox.showinfo("Error", "First buy some stock")
+			root_view.destroy()
+	__main__()
+
 # Creating the buttons
 btn_lookup = ttk.Button(root_menu, text = "Lookup", command = f_lookup)
 btn_lookup.grid(row = 0, column = 2, padx = 3, pady = 5)
 
-btn_buy = ttk.Button(root_menu, text = "Buy Stock", command = f_buy )
+btn_buy = ttk.Button(root_menu, text = "Buy Stock", command = f_buy)
 btn_buy.grid(row = 1, column = 2, padx = 3, pady = 3)
 
+btn_money_left = ttk.Button(root_menu, text = "Funds", width = 9, command = f_money)
+btn_money_left.grid(row = 2, column = 2, padx = 3, pady = 3)
+
+btn_view = ttk.Button(root_menu, text = "View", width = 9, command = f_view)
+btn_view.grid(row = 3, column = 2, padx = 3, pady = 3)
+
 btn_help = ttk.Button(root_menu, text = "Help", width = 9, command = f_help)
-btn_help.grid(row = 3, column = 2, padx = 3, pady = 3)
+btn_help.grid(row = 4, column = 2, padx = 3, pady = 3)
 
 # Ending
 root_menu.mainloop()
