@@ -3,12 +3,14 @@ import pickle
 import webbrowser
 from tkinter import *
 from tkinter import messagebox, ttk
+import os
 
 import requests
 from bs4 import BeautifulSoup
 
 # Syntax dict ##(name: bought price:quantity:final price)##
 
+os.system("pip install lxml")
 # Variables
 try:
 	money = pickle.load(open("money.dat", "rb"))
@@ -394,12 +396,19 @@ def f_sell():
 						
 						global money
 						money = money + price
+						money = round(money, 2)
 						pickle.dump(money, open("money.dat", "wb"))
 						if quantity == stocks[stock_symbol][1]:
 							del stocks [stock_symbol]
+							pickle.dump(stocks, open("stocks.dat", "wb"))
 							root_sell.destroy()
-						pickle.dump(stocks, open("stocks.dat", "wb"))
-
+						else:
+							quantity_stocks = int(stocks[stock_symbol][1])
+							stocks[stock_symbol][1] = (quantity_stocks-quantity)
+							stocks[stock_symbol][2]= stocks[stock_symbol][0] * stocks[stock_symbol][1]
+							pickle.dump(stocks, open("stocks.dat", "wb"))
+							root_sell.destroy()
+							messagebox.showinfo("info",f"{stock_symbol} has been sold for {price}$")
 					btn_continue = Button(root_sell, text="continue?", command=__enter__)
 						
 					btn_continue.grid(row=6, column=0, padx=10, pady=10)
