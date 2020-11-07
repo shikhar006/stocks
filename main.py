@@ -96,7 +96,7 @@ def f_buy():
 
 	# Configure the lookup menu
 	root_buy = Tk()
-	root_buy.title(f"Stonks-Buy-{money}$ left")
+	root_buy.title(f"Stocks-Buy-{money}$ left")
 	root_buy.geometry("200x200")
 	root_buy.grid_columnconfigure(2, weight=1)
 
@@ -208,7 +208,7 @@ def f_buy():
 
 
 def f_help():
-	webbrowser.open("https://shikhar006.github.io/stonks/help.html")
+	webbrowser.open("https://shikhar006.github.io/stocks/help.html")
 
 
 def f_money():
